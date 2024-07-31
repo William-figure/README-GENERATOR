@@ -1,5 +1,6 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer')
+const fs = require('fs')
 // TODO: Create an array of questions for user input
 // const questions = [];
 
@@ -21,5 +22,10 @@ init();
 // }];
 
 // inquirer.prompt(questions).then(answers => {
-//   console.log(`Hello, ${answers.name}!`);
+//   const username = answers.name
+//   const message = `Hello, ${answers.name}.`
+//   fs.appendFile('example.txt', `${message}\n` ,(err) =>
+//     err ? console.log(err) : console.log('Successfully created example.txt!')
+//   )
 // });
+
