@@ -123,7 +123,23 @@ function writeToFile(fileName, data) {
 }
 
 // TODO: Create a function to initialize app
-function init() {}
+function init() {
+  inquirer.prompt(questions).then((answers) => {
+    const readmeContent = generateMarkdown.generateMarkdown(answers)
+    const fileNameOriginal = answers.title
+    const fileNamehasSpaces = fileNameOriginal.includes(" ")
+    const fileNameWithoutSpaces = ''
+    if (fileNamehasSpaces) {
+      fileNameWithoutSpaces = fileNameOriginal.replace(/ /g, "_")
+    }
+    else {
+      fileNameWithoutSpaces = fileNameOriginal
+    }
+
+    writeToFile(fileNameWithoutSpaces, readmeContent)
+
+  })
+}
 
 // Function call to initialize app
 init();
