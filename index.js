@@ -2,86 +2,118 @@
 const inquirer = require('inquirer')
 const fs = require('fs')
 const generateMarkdown = require('./utils/generateMarkdown')
+const validation = (name) => {
+  return value => {
+    if (name === 'title' && (value.trim().length < 5 || value.trim().length > 10)) {
+      return `a proper name please, can't be too long or too short around 5 - 10 characters`
+    }
+    if (name === 'description' && value.trim().length < 50) {
+      return `you can't be that lazy, write at least 50 characters to make a reasonable description!`} else if (['motivation', 'buildReason', 'problem', 'learning', 'installation', 'usage', 'screenshot'].includes(name) && value.trim().length < 20) {
+      return `your project can't be that pointless, write at least 20 characters!`
+    }     
+    return true
+  }
+}
 // TODO: Create an array of questions for user input
 const questions = [
   {
-    type: 'input',
+    type: 'editor',
     name: 'title',
-    message: "What is the title of your project?",
+    message: "What is the title of your project?\n",
+    validate: validation(`title`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'description',
-    message: "Provide a short description explaining the what, why, and how of your project.",
+    message: "Provide a short description explaining the what, why, and how of your project.\n",
+    validate: validation(`description`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'motivation',
-    message: "what was your motivation?",
+    message: "what was your motivation?\n",
+    validate: validation(`motivation`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'buildReason',
-    message: "why did you build this project?",
+    message: "why did you build this project?\n",
+    validate: validation(`buildReason`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'problem',
-    message: "What problem does it solve?",
+    message: "What problem does it solve?\n",
+    validate: validation(`problem`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'learning',
-    message: "What did you learn?",
+    message: "What did you learn?\n",
+    validate: validation(`learning`)
   },
   {
-    type: 'inupt',
+    type: 'editor',
     name: 'installation',
-    message: "What are the steps required to install your project?",
+    message: "What are the steps required to install your project?\n",
+    validate: validation(`installation`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'usage',
-    message: "Provide instructions and examples for use.",
+    message: "Provide instructions and examples for use.\n",
+    validate: validation(`usage`)
   },
   {
-    type: 'input',
+    type: 'editor',
     name: 'screenshot',
-    message: "Provide the relative filepath to a screenshot (e.g., assets/images/screenshot.png).",
+    message: "Provide the relative filepath to a screenshot (e.g., assets/images/screenshot.png).\n",
+    validate: validation(`screenshot`)
   },
   { 
     type: 'confirm',
     name: 'includeCredits',
-    message: "Would you like to include credits?",
+    message: "Would you like to include credits?\n",
     default: false,
   },
   {
     type: 'input',
     name: 'credits',
-    message: "List your collaborators with links to their GitHub profiles.",
+    message: "List your collaborators with links to their GitHub profiles.\n",
     when: (answers) => answers.includeCredits,
   },
   {
     type: 'input',
     name: 'license',
-    message: "What license are you using for your project?",
+    message: "What license are you using for your project?\n",
   },
   {
     type: 'confirm',
     name: 'includeBadges',
-    message: "Would you like to include badges?",
+    message: "Would you like to include badges?\n",
     default: false,
   },
   {
     type: 'input',
     name: 'badges',
-    message: "Provide any badges for your project.",
+    message: "Provide any badges in the format 'name:version:color' separated by commas (e.g., 'Node.js:14.17.0:green, npm:6.14.13:red').\n",
     when: (answers) => answers.includeBadges,
+    validate: (input) => {
+      const badges = input.split(',').map(badge => badge.trim())
+      const badgeFormat = /^[a-zA-Z0-9_.+-]+:[a-zA-Z0-9_.+-]+:[a-zA-Z]+$/;
+
+      for (const badge of badges) {
+        if (!badgeFormat.test(badge)) {
+          return `Invalid format: ${badge}. Please use 'name:version:color' format.`;
+        }
+      }
+      return true;
+    }
   },
   {
     type: 'confirm',
     name: 'includeFeatures',
-    message: "Would you like to include features?",
+    message: "Would you like to include features?\n",
     default: false,
   },
   {
@@ -122,22 +154,23 @@ function writeToFile(fileName, data) {
     err ? console.log(err) : console.log(`Successfully created ${fileName}.md!`))
 }
 
+function generateBadges(badges) {
+  return badges.split(',').map(badge => {
+    const [name, version, color] = badge.split(':').map(part => part.trim());
+    return `![${name}](https://img.shields.io/badge/(${encodeURIComponent(name)}-${encodeURIComponent(version)}-${encodeURIComponent(color)}))`
+  }).join(' ');
+}
 // TODO: Create a function to initialize app
 function init() {
   inquirer.prompt(questions).then((answers) => {
-    const readmeContent = generateMarkdown.generateMarkdown(answers)
+    if (answers.includeBadges) {
+      answers.badges = generateBadges(answers.badges);
+    }
+    const readmeContent = generateMarkdown(answers)
     const fileNameOriginal = answers.title
-    const fileNamehasSpaces = fileNameOriginal.includes(" ")
-    const fileNameWithoutSpaces = ''
-    if (fileNamehasSpaces) {
-      fileNameWithoutSpaces = fileNameOriginal.replace(/ /g, "_")
-    }
-    else {
-      fileNameWithoutSpaces = fileNameOriginal
-    }
+    let fileNameWithoutSpaces = fileNameOriginal.replace(/ /g, "_")
 
     writeToFile(fileNameWithoutSpaces, readmeContent)
-
   })
 }
 

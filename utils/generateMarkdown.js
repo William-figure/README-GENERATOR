@@ -61,15 +61,13 @@ function generateMarkdown(data) {
 
   ${data.usage}
 
-  \'\'\'
   ![Screenshot]($(data.screenshot))
-  \'\'\'
 
   ${data.includeCredits ? `## Credits
 
   List your collaborators with links to their GitHub profiles: ${data.credits}` : ''}
 
-  ${rederLicenseSection(data.license)}
+  ${renderLicenseSection(data.license)}
 
   ${data.includeBadges ? `## Badges
 
@@ -79,7 +77,7 @@ function generateMarkdown(data) {
 
   ${data.features}` : '' }
 
-  ${data.includeContribute ? `## How to Constribute
+  ${data.includeContribute ? `## How to Contribute
 
   ${data.contribute}` : ''}
 
