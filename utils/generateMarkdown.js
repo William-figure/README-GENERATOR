@@ -13,7 +13,7 @@ function renderLicenseLink(license) {
   if (!license) {
     return '';
   }
-  return `[License](https://choosealicense.com/licenses/${license.toLowerCase()}/)`
+  return `[License](#license)`
 }
 
 // TODO: Create a function that returns the license section of README
@@ -24,7 +24,7 @@ function renderLicenseSection(license) {
   }
   return `## License
 
-  This project is licensed under the ${license} license. For more details, see the [License](https://choosealicense.com/licenses/${license.toLowerCase()}/) page.`;
+  This project is licensed under the ${license} license.`
 }
 
 // TODO: Create a function to generate markdown for README
@@ -47,7 +47,7 @@ function generateMarkdown(data) {
   - [Installation](#installation)
   - [Usage](#usage)
   ${data.includeCredits ? '- [Credits](#credits)' : ''}
-  ${data.license ? `- [License](#license)` : ''}
+  - ${renderLicenseLink(data.license)}
   ${data.includeBadges ? '- [Badges](#badges)' : ''}
   ${data.includeFeatures ? '- [Features](#features)' : ''}
   ${data.includeContribute ? '- [How to Contribute](#how-to-contribute)' : ''}
@@ -60,14 +60,8 @@ function generateMarkdown(data) {
   ## Usage
 
   ${data.usage}
-  
-  ## Screenshot
 
-  ${data.screenshot}
-
-  ## Video Demo 
-
-  ${data.youtubeLink}
+  ![Screenshot]($(data.screenshot))
 
   ${data.includeCredits ? `## Credits
 
@@ -95,4 +89,3 @@ function generateMarkdown(data) {
 }
 
 module.exports = generateMarkdown;
-
